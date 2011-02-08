@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head><title>test sinatra page</title></head>
+<body>
+	This is a test:<br/>
+	<% ENV.each do |key, value| %>
+		<b><%=key%></b> = <%=value%><br/>
+	<% end %>
+</body>
+</html>
