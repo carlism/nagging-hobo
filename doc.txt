@@ -6,3 +6,4 @@ POST https://momentapp.com/jobs.json?
   job[uri]=http://yourapp.com/?var1=true&var2=false&
   apikey=[your_api_key]
 
+echo '<job><name>test name</name><trigger_at>2011-05-05 12:00:00</triggered_at></job>' | curl -X POST -H 'Content-type: text/xml' -d @- http://nagging-hobo.heroku.com/jobs

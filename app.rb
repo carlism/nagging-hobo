@@ -41,11 +41,10 @@ module NaggingHobo
         "apikey" => MOMENT_API_KEY }, ';')
       res = Net::HTTP.new("momentapp.com").start {|http| http.request(req) }
       case res
-        when Net::HTTPSuccess, Net::HTTPRedirection
-          puts "Success!"
-        else
-          puts res.error!
-        end
+      when Net::HTTPSuccess, Net::HTTPRedirection
+        puts "Success!"
+      else
+        puts res.error!
       end
     end
 
