@@ -1,0 +1,8 @@
+Requesting a new scheduled job looks like this:
+
+POST https://momentapp.com/jobs.json?
+  job[at]=2011-01-31T18:36:21&
+  job[method]=POST&
+  job[uri]=http://yourapp.com/?var1=true&var2=false&
+  apikey=[your_api_key]
+
