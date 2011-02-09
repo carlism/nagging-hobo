@@ -1,9 +1,27 @@
-Requesting a new scheduled job looks like this:
+Run with
+--------
+> rackup -I . -p 1234
 
+Successful test!
+----------------
+echo '<job><name>test name</name><message>test message</message><email>carl.leiby@gmail.com</email><trigger_at>2011-02-09T14:15:00-05:00</triggered_at></job>' | curl -X POST -H 'Content-type: text/xml' -d @- http://nagging-hobo.heroku.com/jobs
+
+Moment API Info
+----------------
+http://andrewgertig.com/2011/02/using-moment-for-delaying-jobs-in-a-rails-3-app/
+Requesting a new scheduled job looks like this:
 POST https://momentapp.com/jobs.json?
   job[at]=2011-01-31T18:36:21&
   job[method]=POST&
   job[uri]=http://yourapp.com/?var1=true&var2=false&
   apikey=[your_api_key]
 
-echo '<job><name>test name</name><trigger_at>2011-05-05 12:00:00</triggered_at></job>' | curl -X POST -H 'Content-type: text/xml' -d @- http://nagging-hobo.heroku.com/jobs
+Boxcar API Info
+---------------
+Boxcar looks like:
+Here's how to do it using cURL:
+md5 the email address
+curl -d "email=22f3735be3b6f372d7452f5a6b2bbfbe" \
+-d "notification[from_screen_name]=Hello" \
+-d "notification[message]=This+is+an+example" \
+http://boxcar.io/devices/providers/[APIKey]/notifications

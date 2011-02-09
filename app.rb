@@ -56,7 +56,6 @@ module NaggingHobo
     include HTTParty
     base_uri 'https://moment.heroku.com'
     format :json
-    # debug_output $stdout
   end
   
   class Application < Sinatra::Base
@@ -96,9 +95,6 @@ module NaggingHobo
       puts "Job #{@job.name} triggered!"
     end
     
-    get '/test' do
-      erb :test
-    end
   end
 end
 
