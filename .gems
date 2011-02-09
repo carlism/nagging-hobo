@@ -3,4 +3,5 @@ nokogiri
 dm-core
 dm-postgres-adapter
 dm-validations
+dm-migrations
 httparty
