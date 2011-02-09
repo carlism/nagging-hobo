@@ -1,3 +1,6 @@
 sinatra
 nokogiri
-datamapper
+dm-core
+dm-postgres-adapter
+dm-validations
+httparty

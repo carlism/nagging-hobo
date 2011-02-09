@@ -3,62 +3,97 @@ require 'nokogiri'
 require 'dm-core'
 require 'dm-validations'
 require 'dm-migrations'
-require 'net/http'
-require 'net/https'
+require 'httparty'
 
-DataMapper.setup(:default, ENV['DATABASE_URL'] || 'sqlite3://my.db')
+DataMapper.setup(:default, ENV['DATABASE_URL'] || 'sqlite3:hobo.db')
 
 MOMENT_API_KEY = ENV['MOMENT_API_KEY']
+BOXCAR_API_KEY = ENV['BOXCAR_API_KEY']
 
 module NaggingHobo
-  extend self
+  extend self 
+  
+  def content(xml_node)
+    nil_or_block(xml_node) { |node| node.content }
+  end
+  
+  def nil_or_block(value)
+    unless value.nil?
+      yield value
+    end
+  end
   
   class Job
     include DataMapper::Resource
-    property :id,         Integer, :serial=>true
+    property :id,         Serial
+    property :moment_id,  String
     property :name,       String
-    property :created_at, DateTime
+    property :message,    String
+    property :email,      String
+    property :created_at, DateTime, :default=> lambda{|res,prop| DateTime.now }
     property :trigger_at, DateTime    
     property :complete,   Boolean, :default=>false
 
-    validates_present :trigger_at, :name
+    validates_presence_of :trigger_at, :name
+    
+    def self.create_from_xml(xml)
+      doc = Nokogiri::XML(xml)
+      Job.create( 
+        :name => NaggingHobo::content(doc.at('name')), 
+        :trigger_at => NaggingHobo::content(doc.at('trigger_at')),
+        :message => NaggingHobo::content(doc.at('message')),
+        :email => Digest::MD5.hexdigest(NaggingHobo::content(doc.at('email'))) )
+    end
+    
+  end
+  
+  class Boxcar
+    include HTTParty
+    base_uri "http://boxcar.io"
+  end
+  
+  class Moment
+    include HTTParty
+    base_uri 'https://moment.heroku.com'
+    format :json
+    # debug_output $stdout
   end
   
   class Application < Sinatra::Base
-    # Make sure our template can use <%=h
-    helpers do
-      include Rack::Utils
-      alias_method :h, :escape_html
-    end
 
     post '/jobs' do
-      doc = Nokogiri::XML(request.body.read)
-      @job = Job.create( :name => doc.at('name'), :trigger_at => doc.at('trigger_at') )
-      req = Net::HTTP::Post.new("jobs.json")
-      req.use_ssl = true      
-      req.set_form_data({'job[at]' => job.trigger_at, 'job[method]'=>'PUT', 
-        "job[uri]" => "http://nagging-hobo.heroku.com/jobs/#{job.id}/trigger",
-        "apikey" => MOMENT_API_KEY }, ';')
-      res = Net::HTTP.new("momentapp.com").start {|http| http.request(req) }
-      case res
-      when Net::HTTPSuccess, Net::HTTPRedirection
-        puts "Success!"
-      else
-        puts res.error!
+      @job = Job.create_from_xml( request.body.read )
+      options = { :query => { 
+        :apikey => MOMENT_API_KEY,
+        :job => {
+          :at => @job.trigger_at.strftime(fmt='%FT%T%z'),
+          :method => "GET",
+          :uri => "http://nagging-hobo.heroku.com/jobs/#{@job.id}/trigger"
+        }}}
+      result = Moment.post("/jobs.json", options)
+      if result['success']
+        @job.moment_id = result['success']['job']['id']
+        @job.save
       end
+      @job.inspect
     end
 
-    put '/jobs/:id/trigger' do
+    get '/jobs/:id/trigger' do
       @job = Job.get(params[:id])
+   
+      options = { :body => { 
+        :email => @job.email,
+        :notification => {
+          :from_screen_name => @job.name,
+          :message => @job.message
+        }}}
+      
+      Boxcar.post("/devices/providers/#{BOXCAR_API_KEY}/notifications", options)
+      
       @job.complete = true
       @job.save
+            
       puts "Job #{@job.name} triggered!"
-    end
-    
-    get '/test' do
-      # content_type 'text/html'
-      # headers 'Cache-Control' => "public, max-age=600"
-      erb :test
     end
   end
 end
