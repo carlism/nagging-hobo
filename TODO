@@ -1,0 +1,6 @@
+- Formalize configuration: get the hostnames and paths out of the app.rb file.
+- Restructure a bit: extract the datamapper stuff to a seperate file at a minimum.
+- Responses: nothing valuable is returned from my calls, should return something useful.
+- Testing?!: Possibly test around some of the formatting bits and test the helper functions
+- Client!:  Need to write the command-line client
+- Maintenence: Should have a means for deleting a scheduled message.
