@@ -95,6 +95,10 @@ module NaggingHobo
             
       puts "Job #{@job.name} triggered!"
     end
+    
+    get '/test' do
+      erb :test
+    end
   end
 end
 
