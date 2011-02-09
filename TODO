@@ -4,3 +4,4 @@
 - Testing?!: Possibly test around some of the formatting bits and test the helper functions
 - Client!:  Need to write the command-line client
 - Maintenence: Should have a means for deleting a scheduled message.
+- Some error handling couldn't hurt either.
