@@ -7,7 +7,7 @@ module NaggingHobo
       include HTTParty
       base_uri NaggingHobo::Config::BOXCAR_API_URI
       
-      def notify(job)
+      def self.notify(job)
         options = { :body => {
           :email => job.email,
           :notification => {
