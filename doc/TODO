@@ -1,8 +1,8 @@
-TODO: Client!:  Need to write the command-line client
 TODO: Testing?!: Possibly test around some of the formatting bits and test the helper functions
 TODO: Maintenence: Should have a means for deleting a scheduled message.
 TODO: Come up with an API_KEY to email mapping so users can't spam people
 
+DONE: Client!:  Need to write the command-line client
 DONE: Restructure a bit: extract the datamapper stuff to a seperate file at a minimum.
 DONE: Formalize configuration: get the hostnames and paths out of the app.rb file.
 DONE: Responses: nothing valuable is returned from my calls, should return something useful.
