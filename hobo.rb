@@ -7,17 +7,17 @@ require 'chronic'  # gem install aaronh-chronic for Ruby 1.9 compatibility
 module Hobo
   extend self
   include HTTParty
-  #base_uri 'http://nagging-hobo.heroku.com'
-  base_uri 'http://localhost:1234'
+  base_uri 'http://nagging-hobo.heroku.com'
+  #base_uri 'http://localhost:1234'
   format :xml
   debug_output $stdout
 
   def post_job(details)
     builder = Builder::XmlMarkup.new
     post_data = { :body => builder.job { |j|
-      j.name details[:title]
-      j.message details[:msg]
-      j.email details[:email]
+      j.name       details[:title]
+      j.message    details[:msg]
+      j.email      details[:email]
       j.trigger_at details[:time]
     }}
     puts post("/jobs", post_data)
@@ -41,9 +41,11 @@ OptionParser.new do |opts|
     options[:time] = Chronic.parse(time)
   end
 end.parse!
-raise ArgumentError, "title parameter required, see use -h for help" unless options[:title]
-raise ArgumentError, "message parameter required, see use -h for help" unless options[:msg]
-raise ArgumentError, "email parameter required, see use -h for help" unless options[:email]
-raise ArgumentError, "when/time parameter required, see use -h for help" unless options[:time]
+
+[:title, :msg, :email, :time].each do |param|
+  unless options[param]
+    raise ArgumentError, "#{param} parameter is required, use -h for help"
+  end
+end
 
 Hobo.post_job(options)
