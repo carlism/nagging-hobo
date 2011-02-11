@@ -4,13 +4,15 @@ require 'builder'
 require 'optparse'
 require 'chronic'  # gem install aaronh-chronic for Ruby 1.9 compatibility
 
-class Hobo
+module Hobo
+  extend self
   include HTTParty
-  base_uri 'http://nagging-hobo.heroku.com'
+  #base_uri 'http://nagging-hobo.heroku.com'
+  base_uri 'http://localhost:1234'
   format :xml
   debug_output $stdout
 
-  def self.post_job(details)
+  def post_job(details)
     builder = Builder::XmlMarkup.new
     post_data = { :body => builder.job { |j|
       j.name details[:title]
