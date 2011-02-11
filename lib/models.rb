@@ -3,6 +3,7 @@ require 'dm-validations'
 require 'dm-migrations'
 require 'nokogiri'
 require 'config'
+require 'builder'
 
 DataMapper.setup(:default, NaggingHobo::Config::DB_URL)
 
@@ -17,7 +18,7 @@ module NaggingHobo
       property :name,       String
       property :message,    String
       property :email,      String
-      property :created_at, DateTime, :default=> lambda{|res,prop| DateTime.now }
+      property :created_at, DateTime, :default=>lambda{|res,prop| DateTime.now}
       property :trigger_at, DateTime
       property :complete,   Boolean, :default=>false
 
@@ -32,6 +33,15 @@ module NaggingHobo
           :email => Digest::MD5.hexdigest(Model.content(doc.at('email'))) )
       end
 
+      def to_xml
+        builder = Builder::XmlMarkup.new(:indent=>2)
+        builder.job do |j|
+          [:id, :moment_id, :name, :message,
+           :email, :complete, :trigger_at].each do |attr|
+            j.tag!(attr, send(attr))
+          end
+        end
+      end
     end
 
     def content(xml_node)

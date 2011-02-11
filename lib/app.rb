@@ -16,7 +16,7 @@ module NaggingHobo
         @job = Model::Job.create_from_xml( request.body.read )
         @job.moment_id = Service::Moment.schedule_job(@job)
         @job.save
-        [200, erb(:job)]
+        [200, @job.to_xml]
       rescue Exception => err
         [500, erb(:error, :locals => { :error => err })]
       end
@@ -29,7 +29,7 @@ module NaggingHobo
         Service::Boxcar.notify(@job)
         @job.complete = true
         @job.save
-        [200, erb(:success)]
+        [200, "<success/>"]
       rescue Exception => err
         [500, erb(:error, :locals => { :error => err })]
       end

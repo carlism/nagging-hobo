@@ -1,4 +1,4 @@
 <error>
-  <message><%= error.message %></message>
-  <trace><![CDATA[<%=error.backtrace%>]]></trace>
+  <message><%=h error.message %></message>
+  <trace><![CDATA[<%=h error.backtrace%>]]></trace>
 </error>
