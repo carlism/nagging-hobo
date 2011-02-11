@@ -26,10 +26,10 @@ module NaggingHobo
       def self.create_from_xml(xml)
         doc = Nokogiri::XML(xml)
         Job.create(
-          :name => Model::content(doc.at('name')),
-          :trigger_at => Model::content(doc.at('trigger_at')),
-          :message => Model::content(doc.at('message')),
-          :email => Digest::MD5.hexdigest(Model::content(doc.at('email'))) )
+          :name => Model.content(doc.at('name')),
+          :trigger_at => Model.content(doc.at('trigger_at')),
+          :message => Model.content(doc.at('message')),
+          :email => Digest::MD5.hexdigest(Model.content(doc.at('email'))) )
       end
 
     end
