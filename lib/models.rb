@@ -29,6 +29,7 @@ module NaggingHobo
         @job = Model::Job.create_from_xml( xml )
         @job.moment_id = Service::Moment.schedule_job(@job)
         @job.save
+        @job
       end
 
       def self.trigger(id)
@@ -36,6 +37,7 @@ module NaggingHobo
         Service::Boxcar.notify(@job)
         @job.complete = true
         @job.save
+        @job
       end
 
       def self.create_from_xml(xml)
