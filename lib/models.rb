@@ -1,6 +1,7 @@
 require 'dm-core'
 require 'dm-validations'
 require 'dm-migrations'
+require 'services'
 require 'nokogiri'
 require 'config'
 require 'builder'
@@ -42,6 +43,19 @@ module NaggingHobo
           end
         end
       end
+    end
+
+    def self.schedule(xml)
+      @job = Model::Job.create_from_xml( xml )
+      @job.moment_id = Service::Moment.schedule_job(@job)
+      @job.save
+    end
+
+    def self.trigger(id)
+      @job = Model::Job.get(id)
+      Service::Boxcar.notify(@job)
+      @job.complete = true
+      @job.save      
     end
 
     def content(xml_node)

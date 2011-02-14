@@ -1,6 +1,5 @@
 require 'sinatra'
 require 'models'
-require 'services'
 require 'erb'
 
 module NaggingHobo
@@ -13,9 +12,7 @@ module NaggingHobo
     post '/jobs' do
       content_type :xml
       begin
-        @job = Model::Job.create_from_xml( request.body.read )
-        @job.moment_id = Service::Moment.schedule_job(@job)
-        @job.save
+        @job = Model::Job.schedule( request.body.read )
         [200, @job.to_xml]
       rescue Exception => err
         [500, erb(:error, :locals => { :error => err })]
@@ -25,10 +22,7 @@ module NaggingHobo
     get '/jobs/:id/trigger' do
       content_type :xml
       begin
-        @job = Model::Job.get(params[:id])
-        Service::Boxcar.notify(@job)
-        @job.complete = true
-        @job.save
+        @job = Model::Job.trigger(params[:id])
         [200, "<success/>"]
       rescue Exception => err
         [500, erb(:error, :locals => { :error => err })]
