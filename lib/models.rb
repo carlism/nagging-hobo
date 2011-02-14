@@ -25,6 +25,19 @@ module NaggingHobo
 
       validates_presence_of :trigger_at, :name, :email
 
+      def self.schedule(xml)
+        @job = Model::Job.create_from_xml( xml )
+        @job.moment_id = Service::Moment.schedule_job(@job)
+        @job.save
+      end
+
+      def self.trigger(id)
+        @job = Model::Job.get(id)
+        Service::Boxcar.notify(@job)
+        @job.complete = true
+        @job.save
+      end
+
       def self.create_from_xml(xml)
         doc = Nokogiri::XML(xml)
         Job.create(
@@ -43,19 +56,6 @@ module NaggingHobo
           end
         end
       end
-    end
-
-    def self.schedule(xml)
-      @job = Model::Job.create_from_xml( xml )
-      @job.moment_id = Service::Moment.schedule_job(@job)
-      @job.save
-    end
-
-    def self.trigger(id)
-      @job = Model::Job.get(id)
-      Service::Boxcar.notify(@job)
-      @job.complete = true
-      @job.save      
     end
 
     def content(xml_node)
